@@ -10,8 +10,10 @@ const (
 	SPACE    TokenType = iota // all tab characters are replaced by spaces by the parser
 	NEW_LINE                  // \r and \r\n are replaced by \n
 
-	BANG // matches '!'
-	TICK // matches '`'
+	BANG       // matches '!'
+	TICK       // matches '`'
+	UNDERSCORE // matches '_'
+	MINUS      // matches '-'
 
 	LEFT_BRACE    // matches '{'
 	RIGHT_BRACE   // matches '}'
@@ -46,6 +48,10 @@ func (tt TokenType) String() string {
 		return "BANG"
 	case TICK:
 		return "TICK"
+	case UNDERSCORE:
+		return "UNDERSCORE"
+	case MINUS:
+		return "MINUS"
 	case LEFT_BRACE:
 		return "LEFT_BRACE"
 	case RIGHT_BRACE:

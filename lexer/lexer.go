@@ -160,22 +160,22 @@ func matchHash(str string, i *int, lineNo int, tokensList []tokens.Token) tokens
 		switch cnt {
 		case 1:
 			tokenType = tokens.HASH1
-			value = tokenType.String()
+			value = "#"
 		case 2:
 			tokenType = tokens.HASH2
-			value = tokenType.String()
+			value = "##"
 		case 3:
 			tokenType = tokens.HASH3
-			value = tokenType.String()
+			value = "###"
 		case 4:
 			tokenType = tokens.HASH4
-			value = tokenType.String()
+			value = "####"
 		case 5:
 			tokenType = tokens.HASH5
-			value = tokenType.String()
+			value = "#####"
 		case 6:
 			tokenType = tokens.HASH6
-			value = tokenType.String()
+			value = "######"
 		default:
 			tokenType = tokens.WORD
 			value = str[*i-cnt : *i]

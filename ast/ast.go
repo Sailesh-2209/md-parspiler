@@ -30,6 +30,8 @@ func (word Word) Render() string {
 		return fmt.Sprintf("<b><i>%s<i></b>", word.Word)
 	case WORD_CODE:
 		return fmt.Sprintf("<span style=\"font-family: monospace\">%s</span>", word.Word)
+	case WORD_SPACE:
+		return " "
 	}
 
 	return word.Word
@@ -42,7 +44,7 @@ func (heading Heading) Render() string {
 		if headingString == "" {
 			headingString = word.Render()
 		} else {
-			headingString = fmt.Sprintf("%s %s", headingString, word.Render())
+			headingString = fmt.Sprintf("%s%s", headingString, word.Render())
 		}
 	}
 

@@ -17,7 +17,7 @@ func Parse(tokensList []tokens.Token) []ast.ASTNode {
 
 		switch currToken.TokenType {
 		case tokens.HASH1, tokens.HASH2, tokens.HASH3, tokens.HASH4, tokens.HASH5, tokens.HASH6:
-			i++
+			i += 2 // consumes the HASH character, as well as the leading space
 			words := consumeLine(&i, tokensList)
 			node = ast.Heading{
 				Level:   len(currToken.Value),
@@ -34,11 +34,12 @@ func Parse(tokensList []tokens.Token) []ast.ASTNode {
 }
 
 func consumeLine(i *int, tokensList []tokens.Token) []ast.Word {
+	numTokens := len(tokensList)
 	wordsList := []ast.Word{}
 
 	stop := false
 
-	for *i < len(tokensList) && !stop {
+	for *i < numTokens && !stop {
 		currToken := tokensList[*i]
 
 		switch currToken.TokenType {
@@ -46,12 +47,25 @@ func consumeLine(i *int, tokensList []tokens.Token) []ast.Word {
 			stop = true
 			*i++
 		case tokens.SPACE:
-			// spaces are ignored. The final words list is joined
-			// together by single space characters
-			*i++
+			for ; *i < numTokens && tokensList[*i].TokenType == tokens.SPACE; *i++ {
+			}
+			wordsList = append(wordsList, ast.Word{
+				WordType: ast.WORD_SPACE,
+				Word:     " ",
+			})
 		case tokens.UNDERSCORE, tokens.STAR1, tokens.STAR2, tokens.STAR3, tokens.TICK:
-			words := consumeStylizedWords(i, tokensList)
-			wordsList = append(wordsList, words...)
+			if *i == numTokens-1 || tokensList[*i+1].TokenType == tokens.NEW_LINE || tokensList[*i+1].TokenType == tokens.SPACE {
+				// read as word when special character token is not followed by a character
+				word := ast.Word{
+					WordType: ast.WORD_REGULAR,
+					Word:     currToken.Value,
+				}
+				wordsList = append(wordsList, word)
+				*i++
+			} else {
+				words := consumeStylizedWords(i, tokensList)
+				wordsList = append(wordsList, words...)
+			}
 		default:
 			word := ast.Word{
 				WordType: ast.WORD_REGULAR,
@@ -97,11 +111,21 @@ func consumeStylizedWords(i *int, tokensList []tokens.Token) []ast.Word {
 			*i++
 			return wordsList
 		}
-		word := ast.Word{
-			WordType: ast.WORD_REGULAR,
-			Word:     tokensList[*i].Value,
+		if tokensList[*i].TokenType == tokens.SPACE {
+			for ; *i < len(tokensList) && tokensList[*i].TokenType == tokens.SPACE; *i++ {
+			}
+			*i--
+			wordsList = append(wordsList, ast.Word{
+				WordType: ast.WORD_SPACE,
+				Word:     " ",
+			})
+		} else {
+			word := ast.Word{
+				WordType: ast.WORD_REGULAR,
+				Word:     tokensList[*i].Value,
+			}
+			wordsList = append(wordsList, word)
 		}
-		wordsList = append(wordsList, word)
 	}
 
 	return wordsList
